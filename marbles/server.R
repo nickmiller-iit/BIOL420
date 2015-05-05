@@ -57,10 +57,13 @@ bag <- c(rep("red", 600), rep('blue', 400))
 
 shinyServer(function(input, output) {
 
-  output$fig <- renderPlot({
+    output$fig <- renderPlot({
 
-    #generate our sample of marbles
+    # Does nothing excet force re-evaluation without changing the slider
+    input$sample
+    # Generate our sample of marbles
     marbles <- sample(bag, input$n) == "red"
+    
     
     draw_fig(marbles)
     
