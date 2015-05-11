@@ -19,6 +19,9 @@ plot_drift <- function(simulations){
   # how many simulations?
   num <- length(simulations[1,])
   
+  # how many generations?
+  duration <- length(simulations[,1])
+  
   # set up colours
   cols <- rainbow(num)
   #store frequencies in a matrix, each column is one population/locus
@@ -41,26 +44,34 @@ plot_drift <- function(simulations){
 
 }
 
-#assume diploid, could be changed to red from input if needed
+#assume diploid, could be changed to read from input if needed
 ploidy <- 2
 
 shinyServer(function(input, output) {
-
-
   
-  output$drift_plot <- renderPlot({
-    
-    #force next simulation with same parameters
+  # After some head scratching, it looks like the values returned by
+  # a reactive() don't change unless the input changes - the result
+  # appears to be cached.
+  
+  simulations <- reactive({
+    #trigger re-execution if the button is clicked
     input$next_sim
     
-    N <- input$N * ploidy
+    N <- input$N * ploidy    
+    replicate(input$pops, 
+              drift_single(input$p, N, input$g), 
+              simplify = "matrix")
+  })
+  
+  output$drift_plot <- renderPlot({
+      
+    plot_drift(simulations())
     
-    freqs <- replicate(num, 
-                       drift_single(start_p, N, duration), 
-                       simplify = "matrix")
-    
-    plot_drift(freqs)
-    
+  })
+  
+  output$final_p <- renderTable({
+    finals <- simulations()[length(simulations()[,1]), ]
+    data.frame(population = 1:length(finals), frequency = finals)
   })
 
 })

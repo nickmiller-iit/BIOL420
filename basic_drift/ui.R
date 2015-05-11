@@ -16,7 +16,7 @@ shinyUI(fluidPage(
                    label = "Population size",
                    min = 10,
                    max = 1000000,
-                   value = 50,
+                   value = 20,
                    step = 10),
       
       numericInput("g",
@@ -40,9 +40,23 @@ shinyUI(fluidPage(
     
     # Show a plot of the generated distribution
     mainPanel(
-      p("Text"),
+      p("This application simulates the change in frequency of an
+         allele over time due to genetic drift.
+         The simulation assumes a diploid organism.
+         Use the controls to the left to change the starting allele
+         frequency, the population size (number of individuals),
+         the duration of the simulation (generations) and the number
+         of replicate populations to simulate at the same time. Use
+         the \"Next simulation\" buttonto run another simulation with 
+         the same settings."),
       
-      plotOutput("drift_plot")
+      h3("Simulations"),
+      
+      plotOutput("drift_plot"),
+      
+      h3("Final allele frequencies"),
+      
+      tableOutput("final_p")
     )
   )
 ))
