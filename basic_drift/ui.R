@@ -47,7 +47,7 @@ shinyUI(fluidPage(
          frequency, the population size (number of individuals),
          the duration of the simulation (generations) and the number
          of replicate populations to simulate at the same time. Use
-         the \"Next simulation\" buttonto run another simulation with 
+         the \"Next simulation\" button to run another simulation with 
          the same settings."),
       
       h3("Simulations"),
