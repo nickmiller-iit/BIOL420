@@ -39,13 +39,9 @@ sampleMultiGenotype <- function(dataTable, loci){
 
 shinyServer(function(input, output) {
   
-#   simulatedGeno <- reactive({
-#     #force a new simulation using the action button
-#     input$next_sim
-#     sampleMultiGenotype(freq.table, input$chosenLoci)
-#   })
-  
   output$genotype <- renderTable({
+    #trigger re-evaluation with action button
+    input$next_sim
     sampleMultiGenotype(freq.table, input$chosenLoci)
   })
 
