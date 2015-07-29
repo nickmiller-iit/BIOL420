@@ -22,7 +22,9 @@ sampleAllele <- function(dataTable, loc){
 sampleGenotype <- function(dataTable, loc){
   a1 <- sampleAllele(dataTable, loc)
   a2 <- sampleAllele(dataTable, loc)
-  cbind(loc, a1, a2)
+  alleles <- as.numeric(c(a1, a2))
+  alleles <- sort(alleles)
+  cbind(loc, alleles[1], alleles[2])
 }
 
 #sample a multilocus genotype
