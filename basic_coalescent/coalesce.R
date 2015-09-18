@@ -37,3 +37,79 @@ sim.coal <- function(two.N, k){
   }
   return(data.frame(cbind(lineage, lineage_start, lineage_end, lineage_ancestor)))
 }
+
+ancestral_lineages <- function(coal){
+  #return the lineages that are ancestral
+  return(coal$lineage[which(coal$lineage %in% coal$lineage_ancestor)])
+}
+
+sampled_lineages <- function(coal){
+  #return the sampled lineages
+  return(coal$lineage[which(!(coal$lineage %in% ancestral_lineages(coal)))])
+}
+
+path_to_MRCA <- function(coal, lineage){
+  #returns all the ancestral lineages from a specified lineag back to the MRCA
+  #including the lineage itself and the MRCA
+  path <- lineage
+  completed = F
+  while (!completed){
+    anc <- subset(coal, lineage == tail(path, 1))$lineage_ancestor
+    if (is.na(anc)){
+      completed <- T
+    }
+    else{
+      path <- c(path, anc)
+    }
+  }
+  return(path)
+}
+
+get.xpos <- function (coalescent){
+  #Oddly, this was the hardest bit to figure out. This wokrs, but is probably not optimal
+  #
+  #basic problem: we need to se the x positions of the samples lineages such that
+  #coalescing lineages are always adjacent to each other.
+  #
+  #Solution: count up the number of descendants each lineage has. Each sampled lineage
+  #is assigned a score computed by summing the number of descendants for each 
+  #ancestral lineage back to the MRCA. Sampled lineages are ranked by score to get
+  #their relative xpositions. Ranking is then used to assign the absolute x position.
+  #
+  #For ancestral lineages, the x position is simply the midpoint of its 2 descencents
+  #
+  #
+  coal <- coalescent
+  #ensure we return in the same sort order we recieved
+  coal$original_order <- 1:length(coal[,1])
+  #compute number of descendants for each lineage
+  coal$descendants <- rep(0, length(coal[,1]))
+  desc_col <- which(names(coal) == "descendants")
+  for (lin in sort(ancestral_lineages(coal))){
+    descendent_count <-sum(subset(coal, lineage_ancestor == lin)$descendants) + 2
+    coal[which(coal$lineage == lin),desc_col] <- descendent_count
+  }
+  #compute scores for sampled lineages
+  coal$score <- rep(0, length(coal[,1]))
+  score_col <- which(names(coal) == "score")
+  for (lin in sort(sampled_lineages(coal))){
+    score <- sum(subset(coal, lineage %in% path_to_MRCA(coal, lin))$descendants)
+    coal[which(coal$lineage == lin), score_col] <- score
+  }
+  #use scores to set x positions of sampled lineages
+  coal <- arrange(coal, score, lineage)
+  coal$x_pos <- c(rep(0, length(ancestral_lineages(coal))), 1:length(sampled_lineages(coal)))
+  xpos_col <- which(names(coal) == "x_pos")
+  #set x positions of ancestral lineages
+  for (lin in ancestral_lineages(coal)){
+    x <- mean(subset(coal, lineage_ancestor == lin)$x_pos)
+    coal[which(coal$lineage == lin), xpos_col] <- x
+
+  }
+  #back to original order
+  coal <- arrange(coal, original_order)
+  #get rid of intermediate cols
+  coal <- coal[, which(!(names(coal) %in% c("original_order", "descendants", "score")))]
+  return(coal)
+}
+
