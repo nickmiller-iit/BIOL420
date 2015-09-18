@@ -80,7 +80,7 @@ get.xpos <- function (coalescent){
   #
   #
   coal <- coalescent
-  #ensure we return in the same sort order we recieved
+  #ensure we return in the same sort order we received
   coal$original_order <- 1:length(coal[,1])
   #compute number of descendants for each lineage
   coal$descendants <- rep(0, length(coal[,1]))
@@ -113,3 +113,29 @@ get.xpos <- function (coalescent){
   return(coal)
 }
 
+draw.tree <- function(coalescent){
+  #draw a coalescent tree
+  tree <- get.xpos(coalescent)
+  ancestors <- ancestral_lineages(coalescent)
+  height <- max(tree$lineage_end, na.rm=T)
+  width <- max(tree$x_pos)
+  #create the empty plot
+  plot(x = tree$x_pos, 
+       y = tree$lineage_end, 
+       type = "n", 
+       ylim = c(0, height * 1.05), 
+       ylab = "generation", 
+       xaxt = "n", 
+       xlab = "")
+  #draw the lineages
+  for (lin in tree$lineage){
+    l <- subset(tree, lineage == lin)
+    lines(x = c(l$x_pos, l$x_pos), y = c(l$lineage_start, l$lineage_end))
+  }
+  #draw horizontal lines to show coalescences
+  for (anc in ancestors){
+    dec <- subset(tree, lineage_ancestor == anc)
+    lines(x = dec$x_pos, y= dec$lineage_end)
+  }
+  
+}
