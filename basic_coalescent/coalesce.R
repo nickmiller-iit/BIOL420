@@ -66,7 +66,7 @@ path_to_MRCA <- function(coal, lineage){
 }
 
 xorder.sampled <- function(coal){
-  ancestors <- sort(ancestral_lineages(foo), decreasing = T)
+  ancestors <- sort(ancestral_lineages(coal), decreasing = T)
   num_ancestors <- length(ancestors)
   complete <- rep(F, length(ancestors))
   sampled <- sampled_lineages(coal)
