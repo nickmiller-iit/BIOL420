@@ -1,7 +1,7 @@
 library(plyr)
 
 coalesce.discrete <- function(two.N, k){
-  if (k * 10 < two.N){ #use approximation if k << 2N
+  if (k * 30 < two.N){ #use approximation if k << 2N
     p <- ((k*(k-1))/2) * (1/two.N)
   }
   else {
