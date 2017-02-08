@@ -18,7 +18,7 @@ shinyUI(fluidPage(
       numericInput(inputId = "N",
                    label = "Population size",
                    value = 50,
-                   min = 2),
+                   min = 20),
       sliderInput(inputId = "lineages",
                   label = "Number of lineages",
                   min = 2,
