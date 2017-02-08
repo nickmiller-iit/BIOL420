@@ -1,7 +1,12 @@
 library(plyr)
 
 coalesce.discrete <- function(two.N, k){
-  p <- ((k*(k-1))/2) * (1/two.N);
+  if (k * 10 < two.N){ #use approximation if k << 2N
+    p <- ((k*(k-1))/2) * (1/two.N)
+  }
+  else {
+    p <- 1 - prod(1-((1:(k-1))/two.N))
+  }
   return(rgeom(1, p));
 }
 
